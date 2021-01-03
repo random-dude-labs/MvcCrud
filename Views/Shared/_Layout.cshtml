@@ -1,4 +1,13 @@
-﻿<!DOCTYPE html>
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+@inject Microsoft.Extensions.Options.IOptions<Microsoft.AspNetCore.Builder.RequestLocalizationOptions> locOpt
+
+@{
+    var culture = Context.Features.Get<Microsoft.AspNetCore.Localization.IRequestCultureFeature>();
+    var cultureList = locOpt.Value.SupportedUICultures.Select(x => new SelectListItem { Value = x.Name, Text = x.Name }).ToList();
+    var returnUrl = string.IsNullOrWhiteSpace(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -19,18 +28,24 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">@localizer["Home"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="School" asp-action="All">Schools</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="School" asp-action="All">@localizer["Schools"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Teacher" asp-action="AllTeachers">Teachers</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Teacher" asp-action="AllTeachers">@localizer["Teachers"]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Student" asp-action="AllStudents">Students</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Student" asp-action="AllStudents">@localizer["Students"]</a>
                         </li>
                     </ul>
+                </div>
+                <div>
+                    <form asp-action="SetCulture" asp-controller="Home" method="post" asp-route-returnUrl="@returnUrl">
+                        <select name="culture" asp-for="@culture.RequestCulture.UICulture.Name" asp-items="cultureList"
+                                onchange="this.form.submit();"></select>
+                    </form>
                 </div>
             </div>
         </nav>
